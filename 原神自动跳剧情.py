@@ -31,16 +31,16 @@ class genshin_control():
         win32gui.SetForegroundWindow(self.hwnd)
 
     def get_loc(self):
-        if (self.hwnd):
-            rect = win32gui.GetWindowRect(self.hwnd)
-            self.loc = []
-            self.loc.append(rect[0])
-            self.loc.append(rect[1])
-            self.loc.append(rect[2])
-            self.loc.append(rect[3])
-            self.size = []
-            self.size.append(rect[2] - rect[0])
-            self.size.append(rect[3] - rect[1])
+
+        rect = win32gui.GetWindowRect(self.hwnd)
+        self.loc = []
+        self.loc.append(rect[0])
+        self.loc.append(rect[1])
+        self.loc.append(rect[2])
+        self.loc.append(rect[3])
+        self.size = []
+        self.size.append(rect[2] - rect[0])
+        self.size.append(rect[3] - rect[1])
 
     def mouse_move(self, x, y):
         ctypes.windll.user32.SetCursorPos(x, y)
@@ -90,7 +90,7 @@ class genshin_control():
                 max_val
             )
 
-    def find_pic(self, target):
+    def find_pic(self, target, name):
         max_loc = None
         win32gui.SendMessage(self.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
         win32gui.SetForegroundWindow(self.hwnd)
@@ -98,6 +98,10 @@ class genshin_control():
         img = ImageGrab.grab((self.loc[0], self.loc[1], self.loc[2], self.loc[3]))
         img.save('img.jpg')
         img = cv2.imread('img.jpg')
+        if name == 'auto':
+            img = img[0:200, 0:300]
+        if name == 'talk':
+            img = img[int(self.size[1] / 2):int(self.size[1]), int(self.size[0] / 2):int(self.size[0])]
         max_loc = self.match_img(img, target)
         '''(62, 73, 79, 95, 70, 84, 0.9934518337249756)
         0,1 找图左上位置 2，3找图右下位置 4，5找图中心位置 6 匹配度
@@ -107,13 +111,13 @@ class genshin_control():
         return max_loc
 
     def istalking(self):
-        max_loc = self.find_pic(self.auto_template)
+        max_loc = self.find_pic(self.auto_template, 'auto')
         if max_loc[6] > 0.82:
             # os.system("pause")
             print("匹配")
             return True
         else:
-            max_loc = self.find_pic(self.talk_template)
+            max_loc = self.find_pic(self.talk_template, 'talk')
             if max_loc[6] > 0.85:
                 print("匹配")
                 return True
