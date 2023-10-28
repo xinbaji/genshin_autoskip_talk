@@ -1,0 +1,5 @@
+keyboard~=0.13.5
+opencv-python~=4.8.1.78
+pypiwin32~=223
+pywin32~=306
+Pillow~=10.1.0
